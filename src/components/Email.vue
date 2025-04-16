@@ -53,16 +53,17 @@
 
     const result = await sendEmail(email.value)
     
-    if(result == 400) {
-        notification.value = {
-        message: 'Failed to send email',
-        type: 'error'
+    if(result == 201) {
+      notification.value = {
+          message: 'Email sent successfully',
+          type: 'success'
       };
     }
+
     else {
         notification.value = {
-        message: 'An unexpected error occurred',
-        type: 'error'
+          message: 'An unexpected error occurred',
+          type: 'error'
       };
     }
   };
@@ -80,7 +81,7 @@
   text-align: center;
 }
 .success {
-  color: red;
+  color: green;
   text-align: center;
 }
   </style>

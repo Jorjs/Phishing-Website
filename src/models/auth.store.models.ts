@@ -13,7 +13,6 @@ export type AuthState = {
 	user: TUser | null;
 	message: TError | null;
 	sessionTime: number | null;
-	logged: boolean;
 	token: string | null;
 	loginError: TError | null;
 	isLoadingUser: boolean | null;

@@ -16,6 +16,7 @@ async function login(username: string, password: string): Promise<IAuthExport> {
     if (result.data.token !== null) {
       data.data = result.data;
       VueCookieNext.setCookie("token",result.data.token, { expire: expirationDate.toUTCString() });
+      VueCookieNext.setCookie("session", expirationDate.toUTCString(), { expire: expirationDate.toUTCString() });
       VueCookieNext.setCookie("user", JSON.stringify(result.data.user), {
         expire: expirationDate.toUTCString(),
         path: '/'
@@ -36,9 +37,8 @@ async function register(
   username: string,
   password: string
 ) : Promise<IAuthExport> {
-  const data = { data: null, message: null };
+  const data: IAuthExport= { data: null, message: null };
   try {
-    console.log({name, lastName, email, username, password})
     const result = await axios.post(`${url}/auth/register`, {name, lastName, email, username, password});
 
     const expirationDate = new Date();
@@ -46,10 +46,13 @@ async function register(
 
     if (result.data.token !== null) {
       VueCookieNext.setCookie("token",result.data.token, { expire: expirationDate.toUTCString() });
+      VueCookieNext.setCookie("session", expirationDate.toUTCString(), { expire: expirationDate.toUTCString() });
       VueCookieNext.setCookie("user", JSON.stringify(result.data.user), {
         expire: expirationDate.toUTCString(),
         path: '/'
       });
+
+      data.data = result.data;
     }
       router.push({ name: 'table'});
   }

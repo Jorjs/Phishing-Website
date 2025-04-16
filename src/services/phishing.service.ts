@@ -1,6 +1,5 @@
-import type { IAuthExport } from "@/models/auth.store.models";
 import type { IDataItem } from "@/models/phishing.store.models";
-import axios from "axios"
+import axios, { HttpStatusCode } from "axios"
 import { VueCookieNext } from "vue-cookie-next";
 
 const url = "http://localhost:3000/api";
@@ -18,11 +17,11 @@ async function sendEmail(email: string): Promise<number> {
       }
     );
 
-    return 200;
+    return result.status;
   }
   catch(e:any){
     console.log(e);
-    return 400;
+    return HttpStatusCode.BadRequest;
 
   }
 }

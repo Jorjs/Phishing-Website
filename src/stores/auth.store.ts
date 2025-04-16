@@ -20,7 +20,6 @@ export const useAuthStore = defineStore('auth', {
         return null;
       }
     })(),
-    logged: !!VueCookieNext.getCookie('user'),
     message: null as TError | null,
     loginError: null as TError | null,
     invalidLoginInfo: false,
@@ -33,7 +32,8 @@ export const useAuthStore = defineStore('auth', {
       this.isLoadingUser = false;
 
       if(data) {
-        this.user = data.user
+        this.user = data.user;
+        this.token = data.token;
         router.push({ name: 'table' });
       }
 
@@ -53,19 +53,28 @@ export const useAuthStore = defineStore('auth', {
       password: string
     ) 
     {
-        const { message } = await register(name, lastName, email, username, password);
+        const { message, data } = await register(name, lastName, email, username, password);
+
+        if(data) {
+          this.user = data.user;
+          this.token = data.token;
+          router.push({ name: 'table' });
+        }
 
         if (message) {
           this.message = message;
         }
+
+        
     },
     logout() {
       try {
         this.user = null;
-        this.logged = false;
         this.sessionTime = null;
         router.push('/login');
-        reselAllStores();
+        VueCookieNext.removeCookie('user');
+        VueCookieNext.removeCookie('token');
+        VueCookieNext.removeCookie('verify-user');
       } catch (e: any) {
         console.log('logout catch e: ', e);
         this.message = e.message as TError;
@@ -73,9 +82,3 @@ export const useAuthStore = defineStore('auth', {
     },
   },
 });
-
-const reselAllStores = () => {
-  VueCookieNext.removeCookie('user');
-  VueCookieNext.removeCookie('token');
-  VueCookieNext.removeCookie('verify-user');
-};
