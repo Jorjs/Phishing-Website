@@ -3,11 +3,13 @@ import { defineStore } from 'pinia';
 import { VueCookieNext } from 'vue-cookie-next';
 import {login, register} from '../services/auth.service'
 import router from '@/router';
+import { jwtDecode, type JwtPayload } from 'jwt-decode';
+import { useRouter } from 'vue-router';
 
 export const useAuthStore = defineStore('auth', {
   state: (): AuthState => ({
     token: VueCookieNext.getCookie('token') || null,
-    sessionTime: VueCookieNext.getCookie('session') || null,
+    autoLogoutTimer: null,
     user: (() => {
       const userCookie = VueCookieNext.getCookie('user');
       if (!userCookie) return null;
@@ -20,29 +22,26 @@ export const useAuthStore = defineStore('auth', {
         return null;
       }
     })(),
-    message: null as TError | null,
-    loginError: null as TError | null,
-    invalidLoginInfo: false,
-    isLoadingUser: true,
+    error: null as TError | null,
+    isLoading: false,
   }),
   actions: {
     async login(username: string, password: string) {
-      this.isLoadingUser = true;
+      this.isLoading = true;
       const { data, message } = await login(username, password);
-      this.isLoadingUser = false;
+      this.isLoading = false;
 
       if(data) {
+        
         this.user = data.user;
         this.token = data.token;
+        this.startAutoLogoutTimer();
         router.push({ name: 'table' });
+        
       }
 
       if (message) {
-        if(message.status == 401) {
-         this.invalidLoginInfo = true;
-        }
-        this.message = message;
-        this.loginError = message;
+        this.error = message;
       }
     },
     async register(  
@@ -53,7 +52,9 @@ export const useAuthStore = defineStore('auth', {
       password: string
     ) 
     {
+        this.isLoading = true;
         const { message, data } = await register(name, lastName, email, username, password);
+        this.isLoading = false;
 
         if(data) {
           this.user = data.user;
@@ -62,7 +63,7 @@ export const useAuthStore = defineStore('auth', {
         }
 
         if (message) {
-          this.message = message;
+          this.error = message;
         }
 
         
@@ -70,15 +71,34 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       try {
         this.user = null;
-        this.sessionTime = null;
+        if (this.autoLogoutTimer) clearTimeout(this.autoLogoutTimer);
+        this.autoLogoutTimer = null;
         router.push('/login');
         VueCookieNext.removeCookie('user');
         VueCookieNext.removeCookie('token');
         VueCookieNext.removeCookie('verify-user');
       } catch (e: any) {
         console.log('logout catch e: ', e);
-        this.message = e.message as TError;
+        this.error = e.message as TError;
       }
+    },
+    startAutoLogoutTimer() {
+      if (!this.token) return;
+
+      if (this.autoLogoutTimer) clearTimeout(this.autoLogoutTimer);
+
+      const { exp } = jwtDecode<JwtPayload>(this.token);
+      const msUntilExpiry = exp * 1000 - Date.now();
+
+      if (msUntilExpiry <= 0) {
+        this.logout();
+        const router = useRouter();
+        router.push({ name: 'login' });
+
+        return;
+      }
+
+      this.autoLogoutTimer = setTimeout(() => this.logout(), msUntilExpiry);
     },
   },
 });

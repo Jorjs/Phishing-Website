@@ -28,12 +28,12 @@
                 class="mb-4"
               ></v-text-field>
             </v-form>
-            <p class="error" v-if="invalidLoginInfo">Invalid username or password</p>
-            <p class="error" v-else-if="loginError">Something went wrong</p>
+            <p class="error" v-if="error?.message === 'Invalid username or password' ">Invalid username or password</p>
+            <p class="error" v-else-if="error">Something went wrong</p>
           </v-card-text>
           
           <v-card-actions class="d-flex flex-column">
-            <v-btn color="primary" @click="login" block class="mb-2">
+            <v-btn color="primary" @click="login" block class="mb-2" :loading="isLoading">
               Login
             </v-btn>
             <v-btn color="secondary" @click="register" block>
@@ -61,7 +61,7 @@ const form = ref(null);
 
 const userStore = useAuthStore();
 
-const {invalidLoginInfo, loginError} = storeToRefs(userStore)
+const {error, isLoading} = storeToRefs(userStore)
 
 const login = async () => {
   const isValid = await form!.value!.validate();
@@ -78,11 +78,7 @@ const usernameRules = [
   ];
 
   const passwordRules = [
-    (v: string) => !!v || 'Password is required',
-    (v: string) => v.length >= 8 || 'Password must be at least 8 characters long',
-    (v: string) =>
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(v) ||
-      'Password must contain uppercase, lowercase letters, and a number',
+    (v: string) => !!v || 'Password is required'
   ];
 
 </script>

@@ -9,6 +9,7 @@ export interface IDataItem {
     email: string;
     emailContent: string;
     userClicked: boolean;
+    sent: boolean;
   }
 
   export interface IDataItemeExport {

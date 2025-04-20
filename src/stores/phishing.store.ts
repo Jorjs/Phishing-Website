@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import { VueCookieNext } from 'vue-cookie-next';
 import type { PhishingState } from '@/models/phishing.store.models';
 import { getAllAttempts } from '@/services/phishing.service';
 

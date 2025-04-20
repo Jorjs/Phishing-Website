@@ -19,7 +19,7 @@
                 {{ notification.message }}
             </div>
             <v-card-actions class="justify-center">
-              <v-btn color="primary" @click="sendPhishingEmail">
+              <v-btn color="primary" @click="sendPhishingEmail" :loading="isLoading">
                 Send
               </v-btn>
             </v-card-actions>
@@ -32,10 +32,12 @@
   <script lang="ts" setup>
   import { ref } from 'vue';
   import {sendEmail} from '../services/phishing.service'
-  
-  const email = ref('');
+  import { useRouter } from 'vue-router';
+  const router = useRouter();
 
+  const email = ref('');
   const form = ref();
+  const isLoading = ref(false)
 
   const notification = ref<{ message: string; type: string }>({
         message: '',
@@ -51,13 +53,16 @@
     const isValid = await form!.value!.validate();
     if (!isValid.valid) return;
 
+    isLoading.value = true;
     const result = await sendEmail(email.value)
-    
+
     if(result == 201) {
       notification.value = {
           message: 'Email sent successfully',
           type: 'success'
       };
+      router.push({ name: 'table' });
+
     }
 
     else {
@@ -66,6 +71,8 @@
           type: 'error'
       };
     }
+
+    isLoading.value = false;
   };
   </script>
   

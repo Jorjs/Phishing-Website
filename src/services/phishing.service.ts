@@ -2,7 +2,7 @@ import type { IDataItem } from "@/models/phishing.store.models";
 import axios, { HttpStatusCode } from "axios"
 import { VueCookieNext } from "vue-cookie-next";
 
-const url = "http://localhost:3000/api";
+const url = import.meta.env.VITE_API_URL;
 
 async function sendEmail(email: string): Promise<number> {
   try {

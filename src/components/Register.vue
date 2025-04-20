@@ -52,9 +52,10 @@
                   :rules="passwordRules"
                 ></v-text-field>
               </v-form>
+              <p class="error" v-if="error">Something went wrong</p>
             </v-card-text>
             <v-card-actions class="d-flex flex-column">
-              <v-btn color="primary" @click="registerUser" block class="mb-2">
+              <v-btn color="primary" @click="registerUser" block class="mb-2" :loading="isLoading">
                 Register
               </v-btn>
               <v-btn text color="secondary" @click="goToLogin" block>
@@ -71,6 +72,7 @@
   import { ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useAuthStore } from '@/stores/auth.store';
+  import { storeToRefs } from 'pinia';
   
   const form = ref();
   
@@ -105,6 +107,8 @@
   
   const router = useRouter();
   const userStore = useAuthStore();
+
+  const {error, isLoading} = storeToRefs(userStore)
   
   const registerUser = async () => {
     const isValid = await form!.value!.validate();
@@ -131,6 +135,10 @@
   }
   .mb-4 {
     margin-bottom: 1rem;
+  }
+  .error {
+    color: red;
+    text-align: center;
   }
   </style>
   

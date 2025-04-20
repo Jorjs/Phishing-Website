@@ -11,12 +11,10 @@ export interface TUser {
 }
 export type AuthState = {
 	user: TUser | null;
-	message: TError | null;
-	sessionTime: number | null;
+	error: TError | null;
+	autoLogoutTimer: ReturnType<typeof setTimeout> | null;
 	token: string | null;
-	loginError: TError | null;
-	isLoadingUser: boolean | null;
-	invalidLoginInfo: boolean | null;
+	isLoading: boolean;
 }
 
 export type IAuthExport = {
@@ -25,12 +23,7 @@ export type IAuthExport = {
 }
 
 export type TError = {
-	name: string;
 	message: string;
 	status?: number
-	time?: string;
-	type: "warning" | "error" | "success" | "info";
-	token?: string;
-	messageDict: string;
 	data?: any;
 };
