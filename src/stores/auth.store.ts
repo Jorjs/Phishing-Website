@@ -88,7 +88,7 @@ export const useAuthStore = defineStore('auth', {
       if (this.autoLogoutTimer) clearTimeout(this.autoLogoutTimer);
 
       const { exp } = jwtDecode<JwtPayload>(this.token);
-      const msUntilExpiry = exp * 1000 - Date.now();
+      const msUntilExpiry = exp! * 1000 - Date.now();
 
       if (msUntilExpiry <= 0) {
         this.logout();

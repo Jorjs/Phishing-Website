@@ -57,7 +57,7 @@ const toggleShowPassword = ref(false);
 const username = ref('');
 const password = ref('');
 
-const form = ref(null);
+const form = ref<any>(null)
 
 const userStore = useAuthStore();
 
